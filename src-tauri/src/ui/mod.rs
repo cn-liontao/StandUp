@@ -1,8 +1,8 @@
-use record::stand_or_sit;
+use crate::ui::service::stand_or_sit;
 use tauri::{AppHandle, Manager, SystemTray, SystemTrayEvent};
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 
-pub mod record;
+pub mod service;
 
 const STAND_OR_SIT: &str = "stand or sit";
 const TOGGLE_WINDOW: &str = "toggle window";
