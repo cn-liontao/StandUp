@@ -14,7 +14,13 @@ mod bridge;
 
 
 fn main() {
-  let records = read_storage();
+  let records = match read_storage() {
+    Ok(records) => records,
+    Err(err) => {
+        println!("read_storage failed: {:?}", err);
+        vec![]
+    }
+};
 
   tauri::Builder::default()
     .manage(StandingState::init(records))
