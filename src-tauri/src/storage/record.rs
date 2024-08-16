@@ -2,19 +2,19 @@ use home::home_dir;
 use serde::Serialize;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::{fmt, io};
 
-use crate::utils::get_now_timestamp;
+use crate::utils::{get_now_timestamp, get_today_timestamp};
 
 #[derive(Serialize)]
 pub struct StandingRecord {
     // Start Timestamp
-    pub start_time: u128,
+    pub start_time: u64,
     // End Timestamp
-    pub end_time: u128,
+    pub end_time: u64,
     // Stand Duration length (seconds)
-    pub duration: u128,
+    pub duration: u64,
 }
 
 impl StandingRecord {
@@ -33,10 +33,10 @@ impl Default for StandingRecord {
     }
 }
 
-fn str2time(str_op: Option<&str>) -> Result<u128, ParsingError> {
+fn str2time(str_op: Option<&str>) -> Result<u64, ParsingError> {
     match str_op {
         Some(v) => {
-            if let Ok(time) = v.to_string().parse::<u128>() {
+            if let Ok(time) = v.to_string().parse::<u64>() {
                 Ok(time)
             } else {
                 return Err(ParsingError {
@@ -76,16 +76,16 @@ impl fmt::Display for StandingRecord {
 }
 
 #[derive(Serialize)]
-pub struct DayRecords {
+pub struct DayRecord {
     // Date Timestamp (00:00)
-    date: u128,
-    records: Vec<StandingRecord>,
+    pub date: u64,
+    pub records: Vec<StandingRecord>,
 }
 
-impl Default for DayRecords {
+impl Default for DayRecord {
     fn default() -> Self {
-        DayRecords {
-            date: 0,
+        DayRecord {
+            date: get_today_timestamp(),
             records: vec![],
         }
     }
@@ -95,14 +95,14 @@ fn str2record(record_str: &str) -> Result<StandingRecord, ParsingError> {
     record_str.to_string().try_into()
 }
 
-impl TryFrom<String> for DayRecords {
+impl TryFrom<String> for DayRecord {
     type Error = ParsingError;
 
     fn try_from(value: String) -> Result<Self, ParsingError> {
         let mut iter = value.split(" ");
         let start = iter.next();
         let end = iter.next();
-        let mut day_records = DayRecords::default();
+        let mut day_records = DayRecord::default();
 
         day_records.date = str2time(start)?;
         if let Some(records_str) = end {
@@ -122,7 +122,7 @@ impl TryFrom<String> for DayRecords {
     }
 }
 
-impl fmt::Display for DayRecords {
+impl fmt::Display for DayRecord {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let records_str: Vec<String> = self
             .records
@@ -142,12 +142,13 @@ pub struct ParsingError {
     pub message: String,
 }
 
-pub fn read_storage() -> Result<Vec<StandingRecord>, ParsingError> {
+pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
     let mut local_state_path = home_dir().unwrap();
     local_state_path.push(".local");
     local_state_path.push("state");
     let mut storage_file: Option<File> = None;
 
+    // FIXME: remove solve read_dir().unwrap()
     for x in local_state_path.read_dir().unwrap() {
         match x {
             Ok(file) => {
@@ -164,17 +165,12 @@ pub fn read_storage() -> Result<Vec<StandingRecord>, ParsingError> {
         }
     }
 
-    let mut records: Vec<StandingRecord> = vec![];
+    let mut records: Vec<DayRecord> = vec![];
     if let Some(file) = storage_file {
         let content = BufReader::new(file);
         for line in content.lines() {
-            match line.unwrap().try_into() {
-                Ok(record) => {
-                    records.push(record);
-                }
-                Err(parsing_error) => {
-                    println!("Parsing storage error: {}", parsing_error.message)
-                }
+            if let Ok(line_content) = line {
+                records.push(line_content.try_into()?);
             }
         }
     }
@@ -189,7 +185,7 @@ fn touch(path: &Path) -> io::Result<File> {
     }
 }
 
-pub fn save_to_storage(records: &Vec<StandingRecord>) -> io::Result<()> {
+pub fn save_to_storage(records: &Vec<DayRecord>) -> io::Result<()> {
     let mut local_state_path = home_dir().unwrap();
     local_state_path.push(".local");
     local_state_path.push("state");
