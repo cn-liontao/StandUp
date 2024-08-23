@@ -25,16 +25,7 @@ fn stand(state: State<StandingState>) -> Value {
 }
 
 fn sit(state: State<StandingState>) -> Value {
-    let now = get_now_timestamp();
-
-    {
-        let mut standing_records = state.standing_records.lock().unwrap();
-
-        let last_index = (*standing_records).len() - 1;
-        (*standing_records)[last_index].end_time = now;
-    }
-
+    state.end();
     state.flush().unwrap();
-
     state.to_json()
 }

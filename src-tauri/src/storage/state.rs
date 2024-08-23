@@ -2,7 +2,7 @@ use serde_json::{json, Value};
 use std::io;
 use std::sync::Mutex;
 
-use crate::{storage::record::save_to_storage, utils::get_today_timestamp};
+use crate::{storage::record::save_to_storage, utils::{get_now_timestamp, get_today_timestamp}};
 
 use super::record::{DayRecord, StandingError, StandingRecord};
 
@@ -28,10 +28,10 @@ impl StandingState {
         *standing_now = is_standing;
     }
 
-    fn get_today(&self) -> &mut DayRecord {
+    fn map_today<F: Fn(&mut DayRecord) -> ()>(&self, modifier: F) {
         let mut records = self.day_records.lock().unwrap();
         let i = (*records).last_mut();
-        let mut record: &mut DayRecord;
+        let record: &mut DayRecord;
         match i {
             None => {
                 (*records).push(DayRecord::default());
@@ -47,12 +47,21 @@ impl StandingState {
             }
         }
 
-        record
+        modifier(record);
     }
 
     pub fn append(&self) {
-        let mut today_record = self.get_today();
-        today_record.records.push(StandingRecord::default());
+        self.map_today(|today_record| {
+            today_record.records.push(StandingRecord::default());
+        })
+    }
+
+    pub fn end(&self) {
+        self.map_today(|today_record| {
+            if let Some(record) = today_record.records.last_mut() {
+                record.end_time = get_now_timestamp();
+            }
+        });
     }
 
     // FIXME: support drop specify day's standing reocrd

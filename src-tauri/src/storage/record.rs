@@ -10,11 +10,11 @@ use crate::utils::{get_now_timestamp, get_today_timestamp};
 #[derive(Serialize)]
 pub struct StandingRecord {
     // Start Timestamp
-    pub start_time: u64,
+    pub start_time: u128,
     // End Timestamp
-    pub end_time: u64,
+    pub end_time: u128,
     // Stand Duration length (seconds)
-    pub duration: u64,
+    pub duration: u128,
 }
 
 impl StandingRecord {
@@ -33,10 +33,10 @@ impl Default for StandingRecord {
     }
 }
 
-fn str2time(str_op: Option<&str>) -> Result<u64, ParsingError> {
+fn str2time(str_op: Option<&str>) -> Result<u128, ParsingError> {
     match str_op {
         Some(v) => {
-            if let Ok(time) = v.to_string().parse::<u64>() {
+            if let Ok(time) = v.to_string().parse::<u128>() {
                 Ok(time)
             } else {
                 return Err(ParsingError {
@@ -78,7 +78,7 @@ impl fmt::Display for StandingRecord {
 #[derive(Serialize)]
 pub struct DayRecord {
     // Date Timestamp (00:00)
-    pub date: u64,
+    pub date: u128,
     pub records: Vec<StandingRecord>,
 }
 

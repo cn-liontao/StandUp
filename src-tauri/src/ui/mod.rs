@@ -1,4 +1,4 @@
-use crate::ui::service::stand_or_sit;
+use crate::ui::service::{stand_or_sit, get_records};
 use tauri::{AppHandle, Manager, SystemTray, SystemTrayEvent};
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 
@@ -25,6 +25,7 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                 let item_handle = app.tray_handle().get_item(&id);
                 let title = if !is_standing { "站立" } else { "坐下" };
                 item_handle.set_title(title).unwrap();
+                app.emit_all("records-update", get_records(app.state())).expect("Emit [records-update] failed");
             }
             QUIT => {
                 std::process::exit(0);
