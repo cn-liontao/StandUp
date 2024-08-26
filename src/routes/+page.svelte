@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import { dayRecords } from '../store/day_records.js';
-import QuarterView from "../components/calendar/quarter-view.svelte";
+import { dayRecords } from '$store/day-records';
+import QuarterView from "$components/calendar/quarter-view.svelte";
 
 onMount(() => {
 	const listener = dayRecords.listen()

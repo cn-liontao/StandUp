@@ -4,7 +4,7 @@ use std::sync::Mutex;
 
 use crate::{storage::record::save_to_storage, utils::{get_now_timestamp, get_today_timestamp}};
 
-use super::record::{DayRecord, StandingError, StandingRecord};
+use super::record::{DayRecord, ParsingError, StandingError, StandingRecord};
 
 pub struct StandingState {
     standing_now: Mutex<bool>,
@@ -78,7 +78,7 @@ impl StandingState {
         Ok(())
     }
 
-    pub fn flush(&self) -> io::Result<()> {
+    pub fn flush(&self) -> Result<(), ParsingError> {
         save_to_storage(&self.day_records.lock().unwrap())
     }
 

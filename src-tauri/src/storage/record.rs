@@ -1,13 +1,13 @@
-use home::home_dir;
 use serde::Serialize;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
-use std::path::Path;
-use std::{fmt, io};
+use std::path::{Path, PathBuf};
+use std::{fmt, fs, io};
+use directories::ProjectDirs;
 
 use crate::utils::{get_now_timestamp, get_today_timestamp};
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct StandingRecord {
     // Start Timestamp
     pub start_time: u128,
@@ -39,15 +39,15 @@ fn str2time(str_op: Option<&str>) -> Result<u128, ParsingError> {
             if let Ok(time) = v.to_string().parse::<u128>() {
                 Ok(time)
             } else {
-                return Err(ParsingError {
+                Err(ParsingError {
                     message: "NaN".to_string(),
-                });
+                })
             }
         }
         None => {
-            return Err(ParsingError {
+            Err(ParsingError {
                 message: "String is empty".to_string(),
-            });
+            })
         }
     }
 }
@@ -75,7 +75,7 @@ impl fmt::Display for StandingRecord {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct DayRecord {
     // Date Timestamp (00:00)
     pub date: u128,
@@ -142,40 +142,44 @@ pub struct ParsingError {
     pub message: String,
 }
 
-pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
-    let mut local_state_path = home_dir().unwrap();
-    local_state_path.push(".local");
-    local_state_path.push("state");
-    let mut storage_file: Option<File> = None;
+impl ParsingError {
+    fn init(error_msg: &str) -> ParsingError {
+        ParsingError { message: error_msg.to_string() }
+    }
+}
 
-    // FIXME: remove solve read_dir().unwrap()
-    for x in local_state_path.read_dir().unwrap() {
-        match x {
-            Ok(file) => {
-                if file.file_name().eq(".standing") {
-                    storage_file = Some(File::open(file.path().as_path()).unwrap());
-                    break;
+pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
+    if let Some(project_dir) = ProjectDirs::from("cn", "meowbot", "StandUp") {
+        let data_dir = project_dir.data_local_dir();
+
+        fs::create_dir_all(data_dir).map_err(|x| ParsingError::init("Create dir failed"))?;
+
+        let mut storage_file: Option<File> = None;
+
+        for x in data_dir.read_dir().map_err(|e| ParsingError::init("Read dir failed"))? {
+            let file = x.map_err(|e| ParsingError {
+                message: "Read dir failed".to_string(),
+            })?;
+            if file.file_name().eq("records.csv") {
+                storage_file = Some(File::open(file.path().as_path()).map_err(|e| ParsingError::init("Open CSV failed"))?);
+                break;
+            }
+        }
+
+        let mut records: Vec<DayRecord> = vec![];
+        if let Some(file) = storage_file {
+            let content = BufReader::new(file);
+            for line in content.lines() {
+                if let Ok(line_content) = line {
+                    records.push(line_content.try_into()?);
                 }
             }
-            Err(err) => {
-                return Err(ParsingError {
-                    message: "Read dir failed".to_string(),
-                })
-            }
         }
-    }
 
-    let mut records: Vec<DayRecord> = vec![];
-    if let Some(file) = storage_file {
-        let content = BufReader::new(file);
-        for line in content.lines() {
-            if let Ok(line_content) = line {
-                records.push(line_content.try_into()?);
-            }
-        }
+        Ok(records)
+    } else {
+        Err(ParsingError { message: "Cannot create project dir".to_string() })
     }
-
-    Ok(records)
 }
 
 fn touch(path: &Path) -> io::Result<File> {
@@ -185,16 +189,38 @@ fn touch(path: &Path) -> io::Result<File> {
     }
 }
 
-pub fn save_to_storage(records: &Vec<DayRecord>) -> io::Result<()> {
-    let mut local_state_path = home_dir().unwrap();
-    local_state_path.push(".local");
-    local_state_path.push("state");
-    local_state_path.push(".standing");
-    let mut storage_file = touch(local_state_path.as_path())?;
+pub fn save_to_storage(records: &Vec<DayRecord>) -> Result<(), ParsingError> {
+    if let Some(project_dir) = ProjectDirs::from("cn", "meowbot", "StandUp") {
+        let data_dir = project_dir.data_local_dir();
 
-    for record in records.iter() {
-        writeln!(storage_file, "{}", record.to_string())?;
+        fs::create_dir_all(data_dir).map_err(|x| ParsingError::init("Create dir failed"))?;
+
+        let mut storage_file = touch(data_dir).map_err(|e| ParsingError::init("Touch file failed"))?;
+
+        for record in records.iter() {
+            writeln!(storage_file, "{}", record.to_string()).map_err(|e| ParsingError::init("Write line failed"))?;
+        }
+
+        Ok(())
+    } else {
+        Err(ParsingError::init("Create project dir failed"))
     }
+}
 
-    Ok(())
+#[cfg(test)]
+mod tests {
+    use std::fmt::Debug;
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        match read_storage() {
+            Ok(v) => {
+                println!("Ok: {:?}", v);
+            },
+            Err(e) => {
+                println!("Err: {:?}", e)
+            }
+        }
+    }
 }

@@ -17,7 +17,7 @@ function createCalendarState() {
 	})
 
 	return {
-		incrementAnchor: () => {
+		decrementAnchor: () => {
 			update(produce(draft => {
 				if (draft.calendarView === 'quarter') {
 					draft.anchor = subWeeks(12)(draft.anchor)
@@ -26,7 +26,7 @@ function createCalendarState() {
 				}
 			}))
 		},
-		decrementAnchor: () => {
+		incrementAnchor: () => {
 			update(produce(draft => {
 				if (draft.calendarView === 'quarter') {
 					draft.anchor = addWeeks(12)(draft.anchor)
@@ -70,4 +70,4 @@ const getViewSlice = ([$calendarState, $dayRecords]: [CalendarState, DayRecord[]
 
 	return takeRightWhile($dayRecords, (day) => day.date > firstDay)
 }
-export const dayRecordsInCalendarView = derived([calendarState, dayRecords], getViewSlice)
+export const dayRecordsInView = derived([calendarState, dayRecords], getViewSlice)
