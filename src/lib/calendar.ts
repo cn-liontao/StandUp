@@ -1,4 +1,4 @@
-import { eachDayOfInterval, lastDayOfWeek, startOfWeek, subWeeks } from 'date-fns/fp';
+import { eachDayOfInterval, lastDayOfMonth, lastDayOfWeek, startOfMonth, startOfWeek, subWeeks } from 'date-fns/fp';
 
 export const allDaysOfWeeksBefore = (startDate: Date, weekNum: number) => {
 	const lastDay = lastDayOfWeek(startDate)
