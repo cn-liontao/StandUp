@@ -1,25 +1,26 @@
 <script lang="ts">
 	import { dayRecords } from '$store/day-records';
-	import { dayRecordsInCalendarView, calendarState } from '$store/calendar';
+	import { dayRecordsInView, calendarState } from '$store/calendar';
 	import { sumHoursInRecords } from '$lib/record-calc';
+	import SummaryItem from './summary-item.svelte';
 
 	$: daysCount = $dayRecords.length;
 	$: hoursCount = sumHoursInRecords($dayRecords)
-	$: hoursInView = sumHoursInRecords($dayRecordsInCalendarView)
+	$: hoursInView = sumHoursInRecords($dayRecordsInView)
 	$: viewName = $calendarState.calendarView === 'month' ? '月度' : '季度'
 </script>
 
-<div class="flex items-center gap-4">
-	<div class="flex flex-col">
-		<div>{daysCount}</div>
-		<div>天</div>
-	</div>
-	<div class="flex flex-col">
-		<div>{hoursCount}h</div>
-		<div>站立</div>
-	</div>
-	<div class="flex flex-col">
-		<div>{hoursInView}h</div>
-		<div>{viewName}总计</div>
-	</div>
+<div class="flex items-center gap-4 text-sm">
+	<SummaryItem
+		num={daysCount}
+		text="天"
+	/>
+	<SummaryItem
+		num={hoursCount}
+		text="站立"
+	/>
+	<SummaryItem
+		num="{hoursInView}h"
+		text="{viewName}总计"
+	/>
 </div>

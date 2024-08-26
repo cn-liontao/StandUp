@@ -5,7 +5,7 @@ pub fn get_now_timestamp() -> u128 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
-        .as_micros()
+        .as_millis()
 }
 
 pub fn get_today_timestamp() -> u128 {
