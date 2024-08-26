@@ -17,3 +17,17 @@ export const allDaysOfWeeksBefore = (startDate: Date, weekNum: number) => {
 		return acc;
 	}, [] as Date[][])
 }
+
+export const allDaysOfMonth = (startDate: Date) => {
+	const lastDay = lastDayOfMonth(startDate)
+	const firstDay = startOfMonth(startDate)
+
+	return [eachDayOfInterval({ start: firstDay, end: lastDay })]
+}
+
+export const isFirstWeekOfMonth = (date: Date) => {
+	const weekStart = startOfWeek(date)
+	const monthStart = startOfMonth(date)
+
+	return weekStart === monthStart
+}
