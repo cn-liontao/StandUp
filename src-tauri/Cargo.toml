@@ -21,6 +21,7 @@ tauri = { version = "1.7.0", features = ["system-tray"] }
 tokio = { version = "1", features = ["fs"] }
 chrono = "0.4"
 directories = "5.0.1"
+ron = "0.8.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

@@ -1,9 +1,6 @@
 use serde::Serialize;
-use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
-use std::path::{Path, PathBuf};
-use std::{fmt, fs, io};
-use directories::ProjectDirs;
+use std::fmt;
+use crate::utils::errors::ParsingError;
 
 use crate::utils::{get_now_timestamp, get_today_timestamp};
 
@@ -39,9 +36,7 @@ fn str2time(str_op: Option<&str>) -> Result<u128, ParsingError> {
             if let Ok(time) = v.to_string().parse::<u128>() {
                 Ok(time)
             } else {
-                Err(ParsingError {
-                    message: "NaN".to_string(),
-                })
+                Ok(0)
             }
         }
         None => {
@@ -108,12 +103,7 @@ impl TryFrom<String> for DayRecord {
         if let Some(records_str) = end {
             let records_result: Result<Vec<StandingRecord>, ParsingError> =
                 records_str.split(",").map(str2record).collect();
-            match records_result {
-                Ok(records) => {
-                    day_records.records = records;
-                }
-                Err(err) => return Err(err),
-            }
+            day_records.records = records_result?;
         } else {
             day_records.records = vec![];
         }
@@ -130,97 +120,5 @@ impl fmt::Display for DayRecord {
             .map(|record| record.to_string())
             .collect();
         write!(f, "{} {}", self.date, records_str.join(","))
-    }
-}
-
-pub struct StandingError {
-    pub message: String,
-}
-
-#[derive(Debug)]
-pub struct ParsingError {
-    pub message: String,
-}
-
-impl ParsingError {
-    fn init(error_msg: &str) -> ParsingError {
-        ParsingError { message: error_msg.to_string() }
-    }
-}
-
-pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
-    if let Some(project_dir) = ProjectDirs::from("cn", "meowbot", "StandUp") {
-        let data_dir = project_dir.data_local_dir();
-
-        fs::create_dir_all(data_dir).map_err(|x| ParsingError::init("Create dir failed"))?;
-
-        let mut storage_file: Option<File> = None;
-
-        for x in data_dir.read_dir().map_err(|e| ParsingError::init("Read dir failed"))? {
-            let file = x.map_err(|e| ParsingError {
-                message: "Read dir failed".to_string(),
-            })?;
-            if file.file_name().eq("records.csv") {
-                storage_file = Some(File::open(file.path().as_path()).map_err(|e| ParsingError::init("Open CSV failed"))?);
-                break;
-            }
-        }
-
-        let mut records: Vec<DayRecord> = vec![];
-        if let Some(file) = storage_file {
-            let content = BufReader::new(file);
-            for line in content.lines() {
-                if let Ok(line_content) = line {
-                    records.push(line_content.try_into()?);
-                }
-            }
-        }
-
-        Ok(records)
-    } else {
-        Err(ParsingError { message: "Cannot create project dir".to_string() })
-    }
-}
-
-fn touch(path: &Path) -> io::Result<File> {
-    match OpenOptions::new().create(true).write(true).open(path) {
-        Ok(file) => Ok(file),
-        Err(e) => Err(e),
-    }
-}
-
-pub fn save_to_storage(records: &Vec<DayRecord>) -> Result<(), ParsingError> {
-    if let Some(project_dir) = ProjectDirs::from("cn", "meowbot", "StandUp") {
-        let data_dir = project_dir.data_local_dir();
-
-        fs::create_dir_all(data_dir).map_err(|x| ParsingError::init("Create dir failed"))?;
-
-        let mut storage_file = touch(data_dir).map_err(|e| ParsingError::init("Touch file failed"))?;
-
-        for record in records.iter() {
-            writeln!(storage_file, "{}", record.to_string()).map_err(|e| ParsingError::init("Write line failed"))?;
-        }
-
-        Ok(())
-    } else {
-        Err(ParsingError::init("Create project dir failed"))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::fmt::Debug;
-    use super::*;
-
-    #[test]
-    fn test_add() {
-        match read_storage() {
-            Ok(v) => {
-                println!("Ok: {:?}", v);
-            },
-            Err(e) => {
-                println!("Err: {:?}", e)
-            }
-        }
     }
 }

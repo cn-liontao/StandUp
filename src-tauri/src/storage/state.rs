@@ -1,21 +1,30 @@
 use serde_json::{json, Value};
-use std::io;
 use std::sync::Mutex;
-
-use crate::{storage::record::save_to_storage, utils::{get_now_timestamp, get_today_timestamp}};
-
-use super::record::{DayRecord, ParsingError, StandingError, StandingRecord};
+use crate::storage::settings::Settings;
+use super::record::{DayRecord, StandingRecord};
+use super::io::{read_settings, save_setting, save_to_storage};
+use crate::utils::{get_now_timestamp, get_today_timestamp};
+use crate::utils::errors::{ParsingError, StandingError};
 
 pub struct StandingState {
     standing_now: Mutex<bool>,
     pub day_records: Mutex<Vec<DayRecord>>,
+    pub settings: Mutex<Settings>,
+    pub settings_status: Mutex<bool>
 }
 
 impl StandingState {
     pub fn init(records: Vec<DayRecord>) -> Self {
+        let settings = read_settings().unwrap_or_else(|e| {
+            println!("Read setting failed: {:?}", e);
+            Settings::default()
+        });
+
         StandingState {
             standing_now: Mutex::new(false),
             day_records: Mutex::new(records),
+            settings: Mutex::new(settings),
+            settings_status: Mutex::new(false)
         }
     }
 
@@ -85,4 +94,16 @@ impl StandingState {
     pub fn to_json(&self) -> Value {
         json!(*self.day_records.lock().unwrap())
     }
+
+    pub fn set_settings(&mut self, new_settings: Settings) {
+        let mut settings = self.settings.lock().unwrap();
+
+        *settings = new_settings;
+    }
+
+    pub fn flush_settings(&self) -> Result<(), ParsingError> {
+        save_setting(&self.settings.lock().unwrap())
+    }
+
+    pub fn settings_json(&self) -> Value { json!(*self.day_records.lock().unwrap()) }
 }

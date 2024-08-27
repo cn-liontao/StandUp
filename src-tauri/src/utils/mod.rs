@@ -1,3 +1,5 @@
+pub mod errors;
+
 use chrono::{Datelike, Local, TimeZone};
 use std::time::{SystemTime, UNIX_EPOCH};
 
