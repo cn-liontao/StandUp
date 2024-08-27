@@ -1,6 +1,7 @@
-use crate::storage::state::StandingState;
 use serde_json::Value;
 use tauri::State;
+use crate::storage::settings::Settings;
+use crate::storage::state::StandingState;
 
 pub fn stand_or_sit(state: State<StandingState>) -> bool {
     state.set_standing(!state.is_standing());

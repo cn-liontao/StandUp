@@ -32,12 +32,12 @@ function createCalendarState() {
 	const { update, subscribe } = writable<CalendarState>({
 		appSettings: initAppSettings(),
 		anchor: startOfDay(new Date()),
-	})
+	} as CalendarState)
 
 	return {
 		decrementAnchor: () => {
 			update(produce(draft => {
-				if (draft.appSettings.calendar_view === 'quarter') {
+				if (draft.appSettings.calendar_view === 'Quarter') {
 					draft.anchor = subWeeks(12)(draft.anchor)
 				} else {
 					draft.anchor = subMonths(1)(draft.anchor)
@@ -46,7 +46,7 @@ function createCalendarState() {
 		},
 		incrementAnchor: () => {
 			update(produce(draft => {
-				if (draft.appSettings.calendar_view === 'quarter') {
+				if (draft.appSettings.calendar_view === 'Quarter') {
 					draft.anchor = addWeeks(12)(draft.anchor)
 				} else {
 					draft.anchor = addMonths(1)(draft.anchor)
@@ -93,9 +93,9 @@ const getDaysInView = ($calendarState: CalendarState) => {
 	const { appSettings, anchor } = $calendarState
 	const { calendar_view } = appSettings;
 
-	if (calendar_view === 'quarter') {
+	if (calendar_view === 'Quarter') {
 		return allDaysOfWeeksBefore(anchor, 4 * 3)
-	} else if (calendar_view === 'month') {
+	} else if (calendar_view === 'Month') {
 		return allDaysOfMonth(anchor)
 	}
 	throw new Error('unknown calendar view');
@@ -107,7 +107,7 @@ const getViewSlice = ([$calendarState, $dayRecords]: [CalendarState, DayRecord[]
 	const { calendar_view } = appSettings;
 
 	let firstDay: number;
-	if (calendar_view === 'quarter') {
+	if (calendar_view === 'Quarter') {
 		firstDay = subWeeks(11)(startOfWeek(anchor)).getTime();
 	} else {
 		firstDay = startOfMonth(anchor).getTime();
