@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use crate::storage::record::read_storage;
+use crate::storage::io::read_storage;
 use crate::storage::state::StandingState;
 
 use crate::ui::{init_tray_menu, tray_menu_handler};
