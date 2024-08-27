@@ -52,7 +52,7 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                     tauri::WindowUrl::App("settings".into()),
                 )
                 .title("设置")
-                .inner_size(f64::from(300), f64::from(300))
+                .inner_size(f64::from(229), f64::from(115))
                 .build()
                 .unwrap();
             }

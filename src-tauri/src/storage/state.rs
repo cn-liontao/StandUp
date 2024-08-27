@@ -95,7 +95,7 @@ impl StandingState {
         json!(*self.day_records.lock().unwrap())
     }
 
-    pub fn set_settings(&mut self, new_settings: Settings) {
+    pub fn set_settings(&self, new_settings: Settings) {
         let mut settings = self.settings.lock().unwrap();
 
         *settings = new_settings;
@@ -105,5 +105,7 @@ impl StandingState {
         save_setting(&self.settings.lock().unwrap())
     }
 
-    pub fn settings_json(&self) -> Value { json!(*self.day_records.lock().unwrap()) }
+    pub fn settings_json(&self) -> Value { 
+        json!(*self.settings.lock().unwrap()) 
+    }
 }

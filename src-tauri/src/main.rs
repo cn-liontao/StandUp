@@ -5,7 +5,7 @@ use crate::storage::io::read_storage;
 use crate::storage::state::StandingState;
 
 use crate::ui::{init_tray_menu, tray_menu_handler};
-use crate::bridge::get_records;
+// use crate::bridge::get_records;
 
 mod ui;
 mod utils;
@@ -20,7 +20,7 @@ fn main() {
         println!("read_storage failed: {:?}", err);
         vec![]
     }
-};
+  };
 
   tauri::Builder::default()
     .manage(StandingState::init(records))
@@ -28,7 +28,11 @@ fn main() {
     .on_system_tray_event(|app, event| {
       tray_menu_handler(app, event);
     })
-    .invoke_handler(tauri::generate_handler![get_records])
+    .invoke_handler(tauri::generate_handler![
+      bridge::get_records,
+      bridge::get_settings,
+      bridge::save_settings
+    ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

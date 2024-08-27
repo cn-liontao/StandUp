@@ -28,3 +28,12 @@ fn sit(state: State<StandingState>) -> Value {
     state.flush().unwrap();
     state.to_json()
 }
+
+pub fn get_settings(state: State<StandingState>) -> Value {
+    state.settings_json()
+}
+
+pub fn save_settings(state: State<StandingState>, new_settings: Settings) {
+    state.set_settings(new_settings);
+    state.flush_settings().unwrap();
+}
