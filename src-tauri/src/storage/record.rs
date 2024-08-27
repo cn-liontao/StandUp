@@ -124,3 +124,19 @@ impl fmt::Display for DayRecord {
         write!(f, "{} {}", self.date, records_str.join(","))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_duration () {
+        let mut r = StandingRecord {
+            start_time: 0,
+            end_time: 1,
+            duration: 0
+        };
+        r.update_duration();
+        assert_eq!(r.duration, 1);
+    }
+}
