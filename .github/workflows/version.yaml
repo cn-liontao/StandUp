@@ -1,0 +1,32 @@
+name: 'version check'
+
+on:
+  pull_request:
+    branches:
+      - 'release/*'
+
+# This workflow will trigger on each push to the `release` branch to create or update a GitHub release, build your app, and upload the artifacts to the release.
+
+jobs:
+  check-version:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Setup current commit
+        uses: actions/checkout@v4
+
+      - name: Setup target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: pr_base
+
+      - name: Check version bump
+        run: |
+          head_version=$(jq '.package.version' src-tauri/tauri.conf.json)
+          base_version=$(jq '.package.version' pr_base/src-tauri/tauri.conf.json)
+          if [ "$head_version" = "base_version"  ];then
+            echo "Version conflict"
+            exit 1
+          else
+            echo "Version Changed, LGTM"
+          fi
