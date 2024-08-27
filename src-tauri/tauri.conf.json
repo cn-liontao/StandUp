@@ -60,10 +60,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 270,
         "resizable": true,
         "title": "StandUp",
-        "width": 800,
+        "width": 252,
         "visible": true
       }
     ]

@@ -1,13 +1,10 @@
-use home::home_dir;
 use serde::Serialize;
-use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
-use std::path::Path;
-use std::{fmt, io};
+use std::fmt;
+use crate::utils::errors::ParsingError;
 
 use crate::utils::{get_now_timestamp, get_today_timestamp};
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct StandingRecord {
     // Start Timestamp
     pub start_time: u128,
@@ -39,15 +36,13 @@ fn str2time(str_op: Option<&str>) -> Result<u128, ParsingError> {
             if let Ok(time) = v.to_string().parse::<u128>() {
                 Ok(time)
             } else {
-                return Err(ParsingError {
-                    message: "NaN".to_string(),
-                });
+                Ok(0)
             }
         }
         None => {
-            return Err(ParsingError {
+            Err(ParsingError {
                 message: "String is empty".to_string(),
-            });
+            })
         }
     }
 }
@@ -75,7 +70,7 @@ impl fmt::Display for StandingRecord {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct DayRecord {
     // Date Timestamp (00:00)
     pub date: u128,
@@ -108,12 +103,7 @@ impl TryFrom<String> for DayRecord {
         if let Some(records_str) = end {
             let records_result: Result<Vec<StandingRecord>, ParsingError> =
                 records_str.split(",").map(str2record).collect();
-            match records_result {
-                Ok(records) => {
-                    day_records.records = records;
-                }
-                Err(err) => return Err(err),
-            }
+            day_records.records = records_result?;
         } else {
             day_records.records = vec![];
         }
@@ -131,70 +121,4 @@ impl fmt::Display for DayRecord {
             .collect();
         write!(f, "{} {}", self.date, records_str.join(","))
     }
-}
-
-pub struct StandingError {
-    pub message: String,
-}
-
-#[derive(Debug)]
-pub struct ParsingError {
-    pub message: String,
-}
-
-pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
-    let mut local_state_path = home_dir().unwrap();
-    local_state_path.push(".local");
-    local_state_path.push("state");
-    let mut storage_file: Option<File> = None;
-
-    // FIXME: remove solve read_dir().unwrap()
-    for x in local_state_path.read_dir().unwrap() {
-        match x {
-            Ok(file) => {
-                if file.file_name().eq(".standing") {
-                    storage_file = Some(File::open(file.path().as_path()).unwrap());
-                    break;
-                }
-            }
-            Err(err) => {
-                return Err(ParsingError {
-                    message: "Read dir failed".to_string(),
-                })
-            }
-        }
-    }
-
-    let mut records: Vec<DayRecord> = vec![];
-    if let Some(file) = storage_file {
-        let content = BufReader::new(file);
-        for line in content.lines() {
-            if let Ok(line_content) = line {
-                records.push(line_content.try_into()?);
-            }
-        }
-    }
-
-    Ok(records)
-}
-
-fn touch(path: &Path) -> io::Result<File> {
-    match OpenOptions::new().create(true).write(true).open(path) {
-        Ok(file) => Ok(file),
-        Err(e) => Err(e),
-    }
-}
-
-pub fn save_to_storage(records: &Vec<DayRecord>) -> io::Result<()> {
-    let mut local_state_path = home_dir().unwrap();
-    local_state_path.push(".local");
-    local_state_path.push("state");
-    local_state_path.push(".standing");
-    let mut storage_file = touch(local_state_path.as_path())?;
-
-    for record in records.iter() {
-        writeln!(storage_file, "{}", record.to_string())?;
-    }
-
-    Ok(())
 }

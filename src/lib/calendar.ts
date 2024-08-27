@@ -1,4 +1,13 @@
-import { eachDayOfInterval, lastDayOfWeek, startOfWeek, subWeeks } from 'date-fns/fp';
+import {
+	eachDayOfInterval,
+	intlFormat,
+	isSameWeek,
+	lastDayOfMonth,
+	lastDayOfWeek,
+	startOfMonth,
+	startOfWeek,
+	subWeeks
+} from 'date-fns/fp';
 
 export const allDaysOfWeeksBefore = (startDate: Date, weekNum: number) => {
 	const lastDay = lastDayOfWeek(startDate)
@@ -16,4 +25,22 @@ export const allDaysOfWeeksBefore = (startDate: Date, weekNum: number) => {
 
 		return acc;
 	}, [] as Date[][])
+}
+
+export const allDaysOfMonth = (startDate: Date) => {
+	const lastDay = lastDayOfMonth(startDate)
+	const firstDay = startOfMonth(startDate)
+
+	return [eachDayOfInterval({ start: firstDay, end: lastDay })]
+}
+
+export const isFirstWeekOfMonth = (date: Date) => {
+	const weekEnd = lastDayOfWeek(date)
+	const monthStart = startOfMonth(weekEnd)
+
+	return isSameWeek(monthStart)(weekEnd)
+}
+
+export const formatMonth = (date: Date) => {
+	return intlFormat({ locale: 'zh-CN' })({ month: 'long' })(lastDayOfWeek(date))
 }

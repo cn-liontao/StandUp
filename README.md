@@ -1,38 +1,33 @@
-# create-svelte
+# StandUp[WIP]
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+统计站立办公时间的小 App，提供简单的统计视图
 
-## Creating a project
+![App 截图](image.png)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Roadmap
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- [x] 季度视图 + 滚动
+- [x] 简单统计
+- [ ] 用户设置（完成度 50%）
+- [ ] 久坐/久站提醒
+- [ ] 站立切换快捷键、Schema、Raycast 插件
+- [ ] 单日视图
+- [ ] Import / Export
+- [ ] Github CI
 
-# create a new project in my-app
-npm create svelte@latest my-app
+## Development
+
+### Prerequisite
+
+- [Tauri environment](https://tauri.app/v1/guides/getting-started/prerequisites/)
+- node > 20
+- pnpm
+- cargo
+
+### Run
+
 ```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+$ git switch -c dev origin/dev
+$ pnpm i
+$ pnpm tauri dev
 ```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.

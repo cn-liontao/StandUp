@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store'
 import { invoke } from '@tauri-apps/api/tauri'
+import { type Event, listen } from '@tauri-apps/api/event';
 
 export interface StandingRecord {
     start_time: number
@@ -12,8 +13,27 @@ export interface DayRecord {
     records: StandingRecord[]
 }
 
-export const dayRecords = writable<DayRecord[]>([])
+function createDayRecords() {
+    const { set, subscribe } = writable<DayRecord[]>([])
 
-invoke<DayRecord[]>('get_records').then((records) => {
-    dayRecords.set(records)
-})
+    return {
+        subscribe,
+        init: () => {
+            invoke<DayRecord[]>('get_records').then((records) => {
+                set(records)
+            })
+        },
+        listen: () => {
+            return listen('records-update', (event: Event<DayRecord[]>) => {
+                console.log('backend update:', event);
+                set(event.payload);
+            })
+        }
+    }
+}
+
+export const dayRecords = createDayRecords()
+
+if (!import.meta.env.TEST) {
+    dayRecords.init()
+}
