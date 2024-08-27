@@ -2,7 +2,7 @@
 
 统计站立办公时间的小 App，提供简单的统计视图
 
-![App 截图](image.png)
+![App 截图](screenshot.png)
 
 ## Roadmap
 
