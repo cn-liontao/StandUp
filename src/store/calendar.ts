@@ -4,22 +4,40 @@ import { addMonths, addWeeks, startOfDay, startOfMonth, startOfWeek, subMonths, 
 import { allDaysOfMonth, allDaysOfWeeksBefore } from '$lib/calendar';
 import { takeRightWhile } from 'lodash-es';
 import { type DayRecord, dayRecords } from '$store/day-records';
+import { invoke } from '@tauri-apps/api/tauri';
+import { type Event, listen } from '@tauri-apps/api/event';
+
+interface AppSettings {
+	theme: 'light' | 'dark'
+	calendarView: 'quarter' | 'month'
+	hideOnStart: boolean
+	startWithSystem: boolean
+}
+
+function initAppSettings() {
+	return {
+		theme: 'light',
+		calendarView: 'quarter',
+		hideOnStart: false,
+		startWithSystem: false,
+	} as AppSettings;
+}
 
 interface CalendarState {
-	calendarView: 'quarter' | 'month'
+	appSettings: AppSettings
 	anchor: Date
 }
 
 function createCalendarState() {
 	const { update, subscribe } = writable<CalendarState>({
-		calendarView: 'quarter',
+		appSettings: initAppSettings(),
 		anchor: startOfDay(new Date()),
 	})
 
 	return {
 		decrementAnchor: () => {
 			update(produce(draft => {
-				if (draft.calendarView === 'quarter') {
+				if (draft.appSettings.calendarView === 'quarter') {
 					draft.anchor = subWeeks(12)(draft.anchor)
 				} else {
 					draft.anchor = subMonths(1)(draft.anchor)
@@ -28,7 +46,7 @@ function createCalendarState() {
 		},
 		incrementAnchor: () => {
 			update(produce(draft => {
-				if (draft.calendarView === 'quarter') {
+				if (draft.appSettings.calendarView === 'quarter') {
 					draft.anchor = addWeeks(12)(draft.anchor)
 				} else {
 					draft.anchor = addMonths(1)(draft.anchor)
@@ -40,7 +58,20 @@ function createCalendarState() {
 				draft.anchor = startOfDay(new Date())
 			}))
 		},
-		setDL: (dl: CalendarState['calendarView']) => { update(produce(draft => draft.calendarView = dl)) },
+		setDL: (dl: CalendarState['appSettings']['calendarView']) => {
+			update(produce(draft => draft.appSettings.calendarView = dl))
+		},
+		init: () => {
+			invoke<AppSettings>('get_settings').then((settings) => {
+				update(produce(draft => draft.appSettings = settings))
+			})
+		},
+		listen: () => {
+			return listen('settings-update', (event: Event<AppSettings>) => {
+				console.log('settings update:', event);
+				update(produce(draft => draft.appSettings = event.payload))
+			})
+		},
 		subscribe
 	}
 }
@@ -48,7 +79,9 @@ function createCalendarState() {
 export const calendarState = createCalendarState()
 
 const getDaysInView = ($calendarState: CalendarState) => {
-	const { calendarView, anchor } = $calendarState
+	const { appSettings, anchor } = $calendarState
+	const { calendarView } = appSettings;
+
 	if (calendarView === 'quarter') {
 		return allDaysOfWeeksBefore(anchor, 4 * 3)
 	} else if (calendarView === 'month') {
@@ -59,7 +92,8 @@ const getDaysInView = ($calendarState: CalendarState) => {
 export const daysInView = derived(calendarState, getDaysInView)
 
 const getViewSlice = ([$calendarState, $dayRecords]: [CalendarState, DayRecord[]]) => {
-	const { calendarView, anchor } = $calendarState
+	const { appSettings, anchor } = $calendarState
+	const { calendarView } = appSettings;
 
 	let firstDay: number;
 	if (calendarView === 'quarter') {
@@ -71,3 +105,7 @@ const getViewSlice = ([$calendarState, $dayRecords]: [CalendarState, DayRecord[]
 	return takeRightWhile($dayRecords, (day) => day.date > firstDay)
 }
 export const dayRecordsInView = derived([calendarState, dayRecords], getViewSlice)
+
+if (!import.meta.env.TEST) {
+	calendarState.init()
+}

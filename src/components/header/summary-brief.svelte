@@ -7,7 +7,7 @@
 	$: daysCount = $dayRecords.length;
 	$: hoursCount = sumHoursInRecords($dayRecords)
 	$: hoursInView = sumHoursInRecords($dayRecordsInView)
-	$: viewName = $calendarState.calendarView === 'month' ? '月度' : '季度'
+	$: viewName = $calendarState.appSettings.calendarView === 'month' ? '月度' : '季度'
 </script>
 
 <div class="flex items-center gap-4 text-sm">

@@ -6,6 +6,7 @@ pub mod service;
 
 const STAND_OR_SIT: &str = "stand or sit";
 const TOGGLE_WINDOW: &str = "toggle window";
+const SETTINGS: &str = "setting";
 const QUIT: &str = "quit";
 
 pub fn init_tray_menu() -> SystemTray {
@@ -13,6 +14,7 @@ pub fn init_tray_menu() -> SystemTray {
         .add_item(CustomMenuItem::new(STAND_OR_SIT.to_string(), "站立"))
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(CustomMenuItem::new(TOGGLE_WINDOW.to_string(), "显示"))
+        .add_item(CustomMenuItem::new(SETTINGS.to_string(), "设置"))
         .add_item(CustomMenuItem::new(QUIT.to_string(), "关闭"));
     return SystemTray::new().with_menu(tray_menu);
 }
@@ -42,6 +44,17 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                         window.show().unwrap();
                     }
                 }
+            }
+            SETTINGS => {
+                let settings_window = tauri::WindowBuilder::new(
+                    app,
+                    SETTINGS,
+                    tauri::WindowUrl::App("settings".into()),
+                )
+                .title("设置")
+                .inner_size(f64::from(300), f64::from(300))
+                .build()
+                .unwrap();
             }
             _ => {}
         },
