@@ -2,7 +2,7 @@ import { type DayRecord } from "$store/day-records"
 import { sum } from 'lodash-es';
 import type { Interval } from 'date-fns';
 
-export const getRecordByDate = (date: Date) => $dayRecords.find(r => r.date === date.getTime())
+export const getRecordByDate = ($dayRecords: DayRecord[], date: Date) => $dayRecords.find(r => r.date === date.getTime())
 
 export const getActiveHoursByRecord = (dayRecord?: DayRecord) => {
     if (!dayRecord) return 0
@@ -10,8 +10,7 @@ export const getActiveHoursByRecord = (dayRecord?: DayRecord) => {
         acc += record.duration
         return acc
     }, 0)
-    console.log(dayRecord)
-    return microseconds / 1000 / 60 / 24
+    return microseconds / 1000 / 60 / 60
 }
 
 export const getIntervalsByRecord = (dayRecord: DayRecord) => {

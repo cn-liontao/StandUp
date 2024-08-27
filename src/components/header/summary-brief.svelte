@@ -17,7 +17,7 @@
 	/>
 	<SummaryItem
 		num={hoursCount}
-		text="站立"
+		text="总计"
 	/>
 	<SummaryItem
 		num="{hoursInView}h"
