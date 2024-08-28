@@ -5,7 +5,6 @@ use crate::storage::io::read_storage;
 use crate::storage::state::StandingState;
 
 use crate::ui::{init_tray_menu, tray_menu_handler};
-// use crate::bridge::get_records;
 
 mod ui;
 mod utils;

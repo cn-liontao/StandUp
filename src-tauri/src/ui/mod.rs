@@ -23,11 +23,11 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             STAND_OR_SIT => {
-                let is_standing = stand_or_sit(app.state());
+                let is_standing = stand_or_sit(&app.state());
                 let item_handle = app.tray_handle().get_item(&id);
                 let title = if !is_standing { "站立" } else { "坐下" };
                 item_handle.set_title(title).unwrap();
-                app.emit_all("records-update", get_records(app.state())).expect("Emit [records-update] failed");
+                app.emit_all("records-update", get_records(&app.state())).expect("Emit [records-update] failed");
             }
             QUIT => {
                 std::process::exit(0);
