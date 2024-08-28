@@ -3,10 +3,11 @@ use tauri::{AppHandle, Manager, SystemTray, SystemTrayEvent};
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 
 pub mod service;
+pub mod window;
 
 const STAND_OR_SIT: &str = "stand or sit";
 const TOGGLE_WINDOW: &str = "toggle window";
-const SETTINGS: &str = "setting";
+const SETTINGS: &str = "settings";
 const QUIT: &str = "quit";
 
 pub fn init_tray_menu() -> SystemTray {
@@ -46,15 +47,19 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                 }
             }
             SETTINGS => {
-                let settings_window = tauri::WindowBuilder::new(
-                    app,
-                    SETTINGS,
-                    tauri::WindowUrl::App("settings".into()),
-                )
-                .title("设置")
-                .inner_size(f64::from(229), f64::from(115))
-                .build()
-                .unwrap();
+                if let Some(settings_window) = app.get_window(SETTINGS) {
+                    settings_window.set_focus().unwrap();
+                } else {
+                    tauri::WindowBuilder::new(
+                        app,
+                        SETTINGS,
+                        tauri::WindowUrl::App("settings".into()),
+                    )
+                    .title("设置")
+                    .inner_size(f64::from(229), f64::from(115))
+                    .build()
+                    .unwrap();
+                }
             }
             _ => {}
         },
