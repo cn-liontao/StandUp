@@ -5,8 +5,8 @@
 		calendarState.updateAppSettings({ [settingKey]: (e.target as HTMLInputElement).value as AppSettings[typeof settingKey] });
 	}
 	const toggle = (settingKey: keyof AppSettings) => (e: Event) => {
-		const boolValue = (e.target as HTMLInputElement).value as 'on' | 'off' === 'on'
-		calendarState.updateAppSettings({ [settingKey]: boolValue });
+		const checked = (e.target as HTMLInputElement).checked as boolean
+		calendarState.updateAppSettings({ [settingKey]: checked });
 	}
 </script>
 
