@@ -1,6 +1,7 @@
 import { type DayRecord } from "$store/day-records"
 import { sum } from 'lodash-es';
 import type { Interval } from 'date-fns';
+import { lightFormat } from 'date-fns/fp';
 
 export const getRecordByDate = ($dayRecords: DayRecord[], date: Date) => $dayRecords.find(r => r.date === date.getTime())
 
@@ -37,4 +38,10 @@ export const getActivityScoreByHour = (hours: number) => {
 
 export const sumHoursInRecords = (dayRecords: DayRecord[]) => {
 	return sum(dayRecords.map(getActiveHoursByRecord)).toFixed(1)
+}
+
+export const formatDayRecord = (dayRecord: DayRecord) => {
+    const dateStr = lightFormat('yyyy-MM-dd')(dayRecord.date)
+
+	return `${dateStr}: ${getActiveHoursByRecord(dayRecord).toFixed(1)}h`
 }
