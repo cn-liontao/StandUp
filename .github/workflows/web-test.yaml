@@ -1,0 +1,33 @@
+name: 'web test'
+
+on: push
+
+# This workflow will trigger on each push to the `release` branch to create or update a GitHub release, build your app, and upload the artifacts to the release.
+
+jobs:
+  test-web:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Setup current commit
+        uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: install frontend dependencies
+        run: pnpm install
+
+      - name: test frontend
+        run: pnpm run test:ci
