@@ -105,7 +105,10 @@ impl TryFrom<String> for DayRecord {
         if let Some(records_str) = end {
             let records_result: Result<Vec<StandingRecord>, ParsingError> =
                 records_str.split(",").map(str2record).collect();
-            day_records.records = records_result?;
+            day_records.records = records_result?
+                .into_iter()
+                .filter(|x| x.duration > 0)
+                .collect();
         } else {
             day_records.records = vec![];
         }
