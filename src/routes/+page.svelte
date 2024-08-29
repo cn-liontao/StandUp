@@ -19,4 +19,4 @@ const tooltipContent = provideTooltip()
 
 <CalendarHeader />
 <QuarterView />
-<Tooltip content={tooltipContent} />
+<Tooltip content={$tooltipContent} />

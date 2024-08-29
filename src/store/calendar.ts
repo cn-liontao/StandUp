@@ -7,7 +7,7 @@ import { type DayRecord, dayRecords } from '$store/day-records';
 import { invoke } from '@tauri-apps/api/tauri';
 import { type Event, listen } from '@tauri-apps/api/event';
 
-interface AppSettings {
+export interface AppSettings {
 	theme: 'light' | 'dark'
 	calendar_view: 'Quarter' | 'Month'
 	hide_on_start: boolean
