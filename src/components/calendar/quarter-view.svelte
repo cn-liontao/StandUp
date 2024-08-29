@@ -3,7 +3,8 @@
 	import {
 		formatDayRecord,
 		getActiveHoursByRecord,
-		getActivityScoreByHour, getRecordByDate
+		getActivityScoreByHour, 
+		getRecordByDate
 	} from '$lib/record-calc';
 	import { formatMonth, isFirstWeekOfMonth } from '$lib/calendar';
 	import { useTooltip } from '$components/tooltip/index.svelte';
