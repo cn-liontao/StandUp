@@ -61,16 +61,18 @@ pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
 }
 
 fn touch(path: &Path) -> io::Result<File> {
-    OpenOptions::new().create(true).write(true).open(path)
+    OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(path)
 }
 
 pub fn save_to_storage(records: &Vec<DayRecord>) -> Result<(), ParsingError> {
     with_project_path(|(data_dir, _cfg_dir)| {
         let mut storage_file_path = PathBuf::from(data_dir);
         storage_file_path.push(STORAGE_FILE_NAME);
-        let mut storage_file = touch(storage_file_path.as_path()).map_err(|e| {
-            return ParsingError::init_str(e.to_string())
-        })?;
+        let mut storage_file = touch(storage_file_path.as_path()).map_err(|e| ParsingError::init_str(e.to_string()))?;
 
         for record in records.iter() {
             writeln!(storage_file, "{}", record.to_string()).map_err(|e| ParsingError::init_str(e.to_string()))?;

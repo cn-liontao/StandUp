@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store'
-import { invoke } from '@tauri-apps/api/tauri'
-import { type Event, listen } from '@tauri-apps/api/event';
+import { createSyncStore } from './sync'
 
 export interface StandingRecord {
     start_time: number
@@ -18,17 +17,11 @@ function createDayRecords() {
 
     return {
         subscribe,
-        init: () => {
-            invoke<DayRecord[]>('get_records').then((records) => {
-                set(records)
-            })
-        },
-        listen: () => {
-            return listen('records-update', (event: Event<DayRecord[]>) => {
-                console.log('backend update:', event);
-                set(event.payload);
-            })
-        }
+        ...createSyncStore<DayRecord[]>({
+            initCmd: 'get_records',
+            updateEvent: 'records-update',
+            update: set
+        }),
     }
 }
 
