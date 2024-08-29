@@ -1,0 +1,36 @@
+name: 'rust test'
+
+on: push
+
+# This workflow will trigger on each push to the `release` branch to create or update a GitHub release, build your app, and upload the artifacts to the release.
+
+jobs:
+  test-rust:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Setup current commit
+        uses: actions/checkout@v4
+
+      - name: install dependencies (ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+        # webkitgtk 4.0 is for Tauri v1
+
+      - name: Update local toolchain
+        run: |
+          rustup update
+          rustup component add clippy
+
+# TODO: fix code to conformant lint
+#      - name: Lint
+#        run: |
+#          cd src-tauri
+#          cargo fmt -- --check
+#          cargo clippy
+
+      - name: Test
+        run: |
+          cd src-tauri
+          cargo check
+          cargo test --all
