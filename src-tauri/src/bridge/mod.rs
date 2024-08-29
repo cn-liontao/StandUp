@@ -18,7 +18,7 @@ pub fn get_settings(state: State<StandingState>) -> Value {
 
 #[tauri::command]
 pub fn save_settings(app_handle: AppHandle, state: State<StandingState>, new_settings: Settings) {
-    service::save_settings(&state, new_settings)
+    service::save_settings(&state, new_settings);
 
     if let Some(main_window) = app_handle.get_window("main") {
         main_window.emit("settings-update", service::get_settings(&state)).unwrap()
