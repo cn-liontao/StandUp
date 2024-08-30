@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: "/StandUp/",
   title: "Stand up",
   description: "一个统计站立时间的小程序",
   themeConfig: {
