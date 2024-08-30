@@ -26,39 +26,43 @@ fn with_project_path<F>(cb: F) -> Result<(), ParsingError> where F: FnOnce((&Pat
     }
 }
 
+pub fn read_external_storage(path_buf: PathBuf) -> Result<Vec<DayRecord>, ParsingError> {
+    let mut records: Vec<DayRecord> = vec![];
+    let mut storage_file = Some(File::open(path_buf.as_path()).map_err(|e| ParsingError::init("Open External CSV failed"))?);
+
+    if let Some(file) = storage_file {
+        let content = BufReader::new(file);
+        for line in content.lines() {
+            if let Ok(line_content) = line {
+                let record: DayRecord = line_content.try_into()?;
+                if record.date > 0 {
+                    records.push(record);
+                }
+            }
+        }
+    }
+
+    Ok(records)
+}
+
 pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
     let mut records: Vec<DayRecord> = vec![];
     with_project_path(|(data_dir, _cfg_dir)| {
-        let mut storage_file: Option<File> = None;
-
         for x in data_dir.read_dir().map_err(|e| ParsingError::init("Read dir failed"))? {
             let file = x.map_err(|e| ParsingError {
                 message: "Read dir failed".to_string(),
             })?;
             if file.file_name().eq(STORAGE_FILE_NAME) {
-                storage_file = Some(File::open(file.path().as_path()).map_err(|e| ParsingError::init("Open CSV failed"))?);
+                records = read_external_storage(file.path())?;
                 break;
             }
         }
-
-        if let Some(file) = storage_file {
-            let content = BufReader::new(file);
-            for line in content.lines() {
-                if let Ok(line_content) = line {
-                    let record: DayRecord = line_content.try_into()?;
-                    if record.date > 0 {
-                        records.push(record);
-                    }
-                }
-            }
-        }
-
 
         Ok(())
     })?;
 
     Ok(records)
-}
+
 
 fn touch(path: &Path) -> io::Result<File> {
     OpenOptions::new()
@@ -66,6 +70,16 @@ fn touch(path: &Path) -> io::Result<File> {
         .write(true)
         .truncate(true)
         .open(path)
+}
+
+pub fn save_to_external_storage(path: PathBuf, records: Vec<String>) -> Result<(), ParsingError> {
+    let mut external_file = touch(path.as_path()).map_err(|e| ParsingError::init_str(e.to_string()))?;
+
+    for record in records.iter() {
+        writeln!(external_file, "{}", record).map_err(|e| ParsingError::init_str(e.to_string()))?;
+    }
+
+    Ok(())
 }
 
 pub fn save_to_storage(records: &Vec<DayRecord>) -> Result<(), ParsingError> {

@@ -1,6 +1,10 @@
-use crate::ui::service::{stand_or_sit, get_records};
-use tauri::{AppHandle, Manager, SystemTray, SystemTrayEvent};
+use std::borrow::{Borrow, BorrowMut};
+use tauri::api::dialog::FileDialogBuilder;
+use tauri::{AppHandle, Manager, SystemTray, SystemTrayEvent, SystemTraySubmenu};
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
+use crate::storage::io::{read_external_storage, save_to_external_storage};
+use crate::storage::state::StandingState;
+use crate::ui::service::{stand_or_sit, get_records, merge_records};
 use crate::ui::window::{create_settings_window, toggle_main_window};
 
 pub mod service;
@@ -8,6 +12,8 @@ pub mod window;
 
 const STAND_OR_SIT: &str = "stand or sit";
 const TOGGLE_WINDOW: &str = "toggle window";
+const IMPORT_EXTERNAL: &str = "import external records";
+const EXPORT_RECORDS: &str = "export records";
 const SETTINGS: &str = "settings";
 const QUIT: &str = "quit";
 
@@ -42,6 +48,31 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                 let title = if visible { "隐藏面板" } else { "打开面板" };
                 item_handle.set_title(title).unwrap();
             }
+            IMPORT_EXTERNAL => {
+                let app_handle = app.clone();
+                FileDialogBuilder::new().pick_file(move |file_path| {
+                    if let Some(external_path) = file_path {
+                        let read_res = read_external_storage(external_path);
+                        if let Ok(records) = read_res {
+                            merge_records(app_handle, records);
+                        }
+                    }
+                });
+            }
+            EXPORT_RECORDS => {
+                let mut data: Vec<String> = vec![];
+                {
+                    let state = &app.state::<StandingState>();
+                    let day_records = state.day_records.lock().unwrap();
+                    data = (*day_records).iter().map(|r| r.to_string()).collect();
+                }
+                FileDialogBuilder::new().save_file(move |file_path| {
+                    if let Some(external_path) = file_path {
+                        println!("{:?}", external_path);
+                        save_to_external_storage(external_path, data).unwrap()
+                    }
+                })
+            
             SETTINGS => {
                 if let Some(settings_window) = app.get_window(SETTINGS) {
                     settings_window.set_focus().unwrap();

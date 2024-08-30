@@ -4,7 +4,7 @@ use crate::utils::errors::ParsingError;
 
 use crate::utils::{get_now_timestamp, get_today_timestamp};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct StandingRecord {
     // Start Timestamp
     pub start_time: u128,
@@ -72,7 +72,7 @@ impl fmt::Display for StandingRecord {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct DayRecord {
     // Date Timestamp (00:00)
     pub date: u128,
@@ -125,6 +125,25 @@ impl fmt::Display for DayRecord {
             .map(|record| record.to_string())
             .collect();
         write!(f, "{},{}", self.date, records_str.join(";"))
+    }
+}
+
+pub fn merge_records(day_records: &mut Vec<DayRecord>, new_records: Vec<DayRecord>) {
+    for new_record in new_records.iter() {
+        match day_records.iter_mut().find(|r| r.date == new_record.date) {
+            Some(old_record) => {
+                for new_standing_record in new_record.records.iter() {
+                    if let None = old_record.records.iter().find(
+                        |r| r.start_time == new_standing_record.start_time && r.end_time == new_standing_record.end_time
+                    ) {
+                        old_record.records.push(new_standing_record.clone())
+                    }
+                }
+            }
+            None => {
+                day_records.push(new_record.clone());
+            }
+        }
     }
 }
 

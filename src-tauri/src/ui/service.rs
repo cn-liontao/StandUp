@@ -1,5 +1,6 @@
 use serde_json::Value;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
+use crate::storage::record::DayRecord;
 use crate::storage::settings::Settings;
 use crate::storage::state::StandingState;
 
@@ -28,6 +29,12 @@ fn sit(state: &State<StandingState>) -> Value {
     state.end();
     state.flush().unwrap();
     state.to_json()
+}
+
+pub fn merge_records(app: AppHandle, new_records: Vec<DayRecord>) {
+    let state = app.state::<StandingState>();
+    state.merge(new_records);
+    state.flush().unwrap();
 }
 
 pub fn get_settings(state: &State<StandingState>) -> Value {
