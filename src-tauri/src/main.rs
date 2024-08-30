@@ -39,12 +39,17 @@ fn main() {
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 event.window().hide().unwrap();
+                if event.window().label() == "main" {
+                    let app = event.window().app_handle();
+                    let menu_item = app.tray_handle().get_item("toggle window");
+                    menu_item.set_title("打开面板").unwrap();
+                }
                 api.prevent_close();
             }
             _ => {}
         })
         .manage(StandingState::init(records, settings))
-        .system_tray(init_tray_menu())
+        .system_tray(init_tray_menu(hide_on_start))
         .on_system_tray_event(|app, event| {
             tray_menu_handler(app, event);
         })
