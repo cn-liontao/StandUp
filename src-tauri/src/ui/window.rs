@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Result, Window};
+use tauri::{AppHandle, Result, Window, Manager};
 
 pub fn create_main_window(app: AppHandle) -> Result<Window> {
     tauri::WindowBuilder::new(
