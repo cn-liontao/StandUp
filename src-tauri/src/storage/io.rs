@@ -62,7 +62,7 @@ pub fn read_storage() -> Result<Vec<DayRecord>, ParsingError> {
     })?;
 
     Ok(records)
-
+}
 
 fn touch(path: &Path) -> io::Result<File> {
     OpenOptions::new()

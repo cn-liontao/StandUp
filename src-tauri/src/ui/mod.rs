@@ -72,7 +72,7 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                         save_to_external_storage(external_path, data).unwrap()
                     }
                 })
-            
+            }
             SETTINGS => {
                 if let Some(settings_window) = app.get_window(SETTINGS) {
                     settings_window.set_focus().unwrap();
