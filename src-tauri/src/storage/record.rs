@@ -96,7 +96,7 @@ impl TryFrom<String> for DayRecord {
     type Error = ParsingError;
 
     fn try_from(value: String) -> Result<Self, ParsingError> {
-        let mut iter = value.split(" ");
+        let mut iter = value.split(",");
         let start = iter.next();
         let end = iter.next();
         let mut day_records = DayRecord::default();
@@ -104,7 +104,7 @@ impl TryFrom<String> for DayRecord {
         day_records.date = str2time(start)?;
         if let Some(records_str) = end {
             let records_result: Result<Vec<StandingRecord>, ParsingError> =
-                records_str.split(",").map(str2record).collect();
+                records_str.split(";").map(str2record).collect();
             day_records.records = records_result?
                 .into_iter()
                 .filter(|x| x.duration > 0)
@@ -124,7 +124,7 @@ impl fmt::Display for DayRecord {
             .iter()
             .map(|record| record.to_string())
             .collect();
-        write!(f, "{} {}", self.date, records_str.join(","))
+        write!(f, "{},{}", self.date, records_str.join(";"))
     }
 }
 
