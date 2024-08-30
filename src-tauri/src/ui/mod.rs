@@ -23,6 +23,12 @@ pub fn init_tray_menu(hide_on_start: bool) -> SystemTray {
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(CustomMenuItem::new(TOGGLE_WINDOW.to_string(), if hide_on_start { "打开面板" } else { "隐藏面板" }))
         .add_item(CustomMenuItem::new(SETTINGS.to_string(), "打开设置"))
+        .add_submenu(SystemTraySubmenu::new(
+            "备份",
+            SystemTrayMenu::new()
+                .add_item(CustomMenuItem::new(IMPORT_EXTERNAL.to_string(), "导入记录"))
+                .add_item(CustomMenuItem::new(EXPORT_RECORDS.to_string(), "导出记录"))
+        ))
         .add_item(CustomMenuItem::new(QUIT.to_string(), "退出"));
 
     SystemTray::new().with_menu(tray_menu)
