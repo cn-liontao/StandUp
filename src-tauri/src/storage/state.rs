@@ -1,8 +1,9 @@
 use serde_json::{json, Value};
 use std::sync::Mutex;
+use std::borrow::BorrowMut;
 use crate::storage::settings::Settings;
-use super::record::{DayRecord, StandingRecord};
-use super::io::{read_settings, save_setting, save_to_storage};
+use super::record::{merge_records, DayRecord, StandingRecord};
+use super::io::{save_setting, save_to_storage};
 use crate::utils::{get_now_timestamp, get_today_timestamp};
 use crate::utils::errors::{ParsingError, StandingError};
 
@@ -64,6 +65,7 @@ impl StandingState {
         self.map_today(|today_record| {
             if let Some(record) = today_record.records.last_mut() {
                 record.end_time = get_now_timestamp();
+                record.update_duration();
             }
         });
     }
@@ -88,6 +90,12 @@ impl StandingState {
 
     pub fn to_json(&self) -> Value {
         json!(*self.day_records.lock().unwrap())
+    }
+
+    pub fn merge(&self, day_records: Vec<DayRecord>) {
+        let mut records = self.day_records.lock().unwrap();
+
+        merge_records(records.borrow_mut(), day_records);
     }
 
     pub fn set_settings(&self, new_settings: Settings) {
