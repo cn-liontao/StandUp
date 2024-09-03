@@ -5,7 +5,7 @@ import { allDaysOfMonth, allDaysOfWeeksBefore } from '$lib/calendar';
 import { takeRightWhile } from 'lodash-es';
 import { type DayRecord, dayRecords } from '$store/day-records';
 import { invoke } from '@tauri-apps/api/tauri';
-import { type Event, listen } from '@tauri-apps/api/event';
+import { createSyncStore } from './sync';
 
 export interface AppSettings {
 	theme: 'light' | 'dark'
@@ -71,18 +71,11 @@ function createCalendarState() {
 				})
 			}))
 		},
-		init: () => {
-			invoke<AppSettings>('get_settings').then((settings) => {
-				console.log('init', settings)
-				update(produce(draft => { draft.appSettings = settings }))
-			})
-		},
-		listen: () => {
-			return listen('settings-update', (event: Event<AppSettings>) => {
-				console.log('settings update:', event);
-				update(produce(draft => { draft.appSettings = event.payload }))
-			})
-		},
+		...createSyncStore<AppSettings>({
+			initCmd: 'get_settings',
+			updateEvent: 'settings-update',
+			update: settings => update(produce(draft => { draft.appSettings = settings }))
+		}),
 		subscribe
 	}
 }

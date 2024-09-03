@@ -3,7 +3,7 @@
 	import {
 		formatDayRecord,
 		getActiveHoursByRecord,
-		getActivityScoreByHour, 
+		getActivityScoreByHour,
 		getRecordByDate
 	} from '$lib/record-calc';
 	import { formatMonth, isFirstWeekOfMonth } from '$lib/calendar';

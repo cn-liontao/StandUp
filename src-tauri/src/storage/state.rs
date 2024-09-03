@@ -14,12 +14,7 @@ pub struct StandingState {
 }
 
 impl StandingState {
-    pub fn init(records: Vec<DayRecord>) -> Self {
-        let settings = read_settings().unwrap_or_else(|e| {
-            println!("Read setting failed: {:?}", e);
-            Settings::default()
-        });
-
+    pub fn init(records: Vec<DayRecord>, settings: Settings) -> Self {
         StandingState {
             standing_now: Mutex::new(false),
             day_records: Mutex::new(records),
