@@ -9,11 +9,11 @@
 - [x] 季度视图 + 滚动
 - [x] 简单统计
 - [x] 用户设置
-- [ ] 久坐/久站提醒
-- [ ] 站立切换快捷键、Schema、Raycast 插件
+- [x] 久坐/久站提醒
+- [ ] ~~站立切换快捷键、Schema、Raycast 插件~~
 - [ ] 单日视图
-- [ ] Import / Export
-- [ ] Github CI
+- [x] Import / Export
+- [x] Github CI
 
 ## Development
 

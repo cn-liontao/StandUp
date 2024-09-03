@@ -64,7 +64,7 @@ jobs:
           rustup component add clippy
 
       - name: install frontend dependencies
-        run: pnpm install --prod
+        run: pnpm install
 
       - uses: tauri-apps/tauri-action@v0
         env:
