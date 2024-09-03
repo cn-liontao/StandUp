@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type AppSettings, calendarState } from '$store/calendar';
+	import { checkNotificationPermission } from '$lib/notification';
 
 	const update = (settingKey: keyof AppSettings) => (e: Event) => {
 		calendarState.updateAppSettings({ [settingKey]: (e.target as HTMLInputElement).value as AppSettings[typeof settingKey] });
@@ -7,6 +8,11 @@
 	const toggle = (settingKey: keyof AppSettings) => (e: Event) => {
 		const checked = (e.target as HTMLInputElement).checked as boolean
 		calendarState.updateAppSettings({ [settingKey]: checked });
+
+		if (settingKey === 'enable_notification' && checked) {
+			const permissionGranted = await checkNotificationPermission();
+			if (!permissionGranted) calendarState.updateAppSettings({ [settingKey]: false });
+		}
 	}
 </script>
 
@@ -44,6 +50,15 @@
 		/>
 	</label>
 	<label class="flex justify-between">
+		启用通知：
+		<input
+			type="checkbox"
+			checked={$calendarState.appSettings.enable_notification}
+			on:change={toggle('enable_notification')}
+		/>
+	</label>
+	<!--
+	<label class="flex justify-between">
 		跟随系统启动：
 		<input
 			type="checkbox"
@@ -51,5 +66,6 @@
 			on:change={toggle('start_with_system')}
 		/>
 	</label>
+	-->
 </form>
 

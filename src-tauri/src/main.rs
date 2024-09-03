@@ -63,7 +63,7 @@ fn main() {
 
     app.run(|app_handle, event| match event {
         tauri::RunEvent::ExitRequested { api, .. } => {
-            stand_or_sit(&app_handle.state());
+            stand_or_sit(app_handle.clone());
         }
         _ => {}
     })

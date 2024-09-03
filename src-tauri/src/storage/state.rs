@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 use std::sync::Mutex;
 use std::borrow::BorrowMut;
+use tokio_util::sync::CancellationToken;
 use crate::storage::settings::Settings;
 use super::record::{merge_records, DayRecord, StandingRecord};
 use super::io::{save_setting, save_to_storage};
@@ -11,7 +12,8 @@ pub struct StandingState {
     standing_now: Mutex<bool>,
     pub day_records: Mutex<Vec<DayRecord>>,
     pub settings: Mutex<Settings>,
-    pub settings_status: Mutex<bool>
+    pub settings_status: Mutex<bool>,
+    notification_task_token: Mutex<CancellationToken>
 }
 
 impl StandingState {
@@ -20,8 +22,22 @@ impl StandingState {
             standing_now: Mutex::new(false),
             day_records: Mutex::new(records),
             settings: Mutex::new(settings),
-            settings_status: Mutex::new(false)
+            settings_status: Mutex::new(false),
+            notification_task_token: Mutex::new(CancellationToken::default())
         }
+    }
+
+    pub fn enable_notification(&self) -> bool {
+        (*self.settings.lock().unwrap()).enable_notification
+    }
+
+    pub fn cancel_notification_task(&self) {
+        self.notification_task_token.lock().unwrap().cancel();
+    }
+
+    pub fn set_notification_task(&self, cancel_token: CancellationToken) {
+        self.cancel_notification_task();
+        *self.notification_task_token.lock().unwrap() = cancel_token;
     }
 
     pub fn is_standing(&self) -> bool {

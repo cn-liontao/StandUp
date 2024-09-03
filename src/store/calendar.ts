@@ -12,6 +12,7 @@ export interface AppSettings {
 	calendar_view: 'Quarter' | 'Month'
 	hide_on_start: boolean
 	start_with_system: boolean
+	enable_notification: boolean
 }
 
 function initAppSettings() {
@@ -20,6 +21,7 @@ function initAppSettings() {
 		calendar_view: 'Quarter',
 		hide_on_start: false,
 		start_with_system: false,
+		enable_notification: false
 	} as AppSettings;
 }
 
