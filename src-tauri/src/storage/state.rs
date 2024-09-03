@@ -65,6 +65,7 @@ impl StandingState {
         self.map_today(|today_record| {
             if let Some(record) = today_record.records.last_mut() {
                 record.end_time = get_now_timestamp();
+                record.update_duration();
             }
         });
     }

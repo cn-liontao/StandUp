@@ -15,7 +15,7 @@ pub struct StandingRecord {
 }
 
 impl StandingRecord {
-    fn update_duration(&mut self) {
+    pub fn update_duration(&mut self) {
         if self.end_time > self.start_time {
             self.duration = self.end_time - self.start_time
         }
