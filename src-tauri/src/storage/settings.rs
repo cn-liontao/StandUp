@@ -24,6 +24,9 @@ pub struct Settings {
     pub calendar_view: CalendarView,
 
     #[serde(default)]
+    pub enable_notification: bool,
+
+    #[serde(default)]
     pub hide_on_start: bool,
 
     #[serde(default)]
@@ -35,6 +38,7 @@ impl Default for Settings {
         Settings {
             theme: "light".to_string(),
             calendar_view: CalendarView::Quarter,
+            enable_notification: false,
             hide_on_start: false,
             start_with_system: false
         }

@@ -9,6 +9,7 @@ use crate::ui::window::{create_settings_window, toggle_main_window};
 
 pub mod service;
 pub mod window;
+mod notification;
 
 const STAND_OR_SIT: &str = "stand or sit";
 const TOGGLE_WINDOW: &str = "toggle window";
@@ -38,7 +39,7 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             STAND_OR_SIT => {
-                let is_standing = stand_or_sit(&app.state());
+                let is_standing = stand_or_sit(app.clone());
                 let item_handle = app.tray_handle().get_item(&id);
                 let title = if !is_standing { "站起来" } else { "坐下歇会" };
                 item_handle.set_title(title).unwrap();
