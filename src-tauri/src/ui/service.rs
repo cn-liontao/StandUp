@@ -1,17 +1,19 @@
 use serde_json::Value;
 use tauri::{AppHandle, Manager, State};
+use tokio_util::sync::CancellationToken;
 use crate::storage::record::DayRecord;
 use crate::storage::settings::Settings;
 use crate::storage::state::StandingState;
+use crate::ui::notification::schedule_notification;
 
 pub fn stand_or_sit(app_handle: AppHandle) -> bool {
     let state: State<StandingState> = app_handle.state();
     state.set_standing(!state.is_standing());
     let is_standing = state.is_standing();
     if is_standing {
-        stand(state);
+        stand(&state);
     } else {
-        sit(state);
+        sit(&state);
     }
 
     if state.enable_notification() {
