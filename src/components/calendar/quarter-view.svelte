@@ -43,7 +43,7 @@
 			<div class="flex flex-col gap-1 relative">
 				{#each week as day, dayIndex}
 					<button
-						on:click={() => toogleDailyView(day)}
+						on:click={() => toggleDailyView(day)}
 						on:focus={updateTooltip}
 						on:mouseover={updateTooltip}
 						tabindex={weekIndex * 7 + dayIndex}
