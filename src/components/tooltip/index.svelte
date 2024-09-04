@@ -20,7 +20,7 @@
 </script>
 
 {#if content}
-	<div class="px-1.8 py-1 opacity-70 text-white bg-gray-800 rounded-md fixed left-1.5 bottom-1.5">
+	<div class="z-10 px-1.8 py-1 opacity-70 text-white bg-gray-800 rounded-md fixed left-1.5 bottom-1.5">
 		<div class="font-sans text-sm">{content}</div>
 	</div>
 {/if}
