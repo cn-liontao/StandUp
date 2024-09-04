@@ -11,5 +11,6 @@ export default defineConfig({
 	],
 	safelist: [
 		...Array.from({ length: 9 }, (_, i) => `bg-green-${i + 1}00`),
+		...Array.from({ length: 9 }, (_, i) => `dark:bg-neutral-${i + 1}`),
 	]
 })

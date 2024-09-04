@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { createSyncStore } from './sync';
 
 export interface AppSettings {
-	theme: 'light' | 'dark'
+	theme: 'light' | 'dark' | 'system'
 	calendar_view: 'Quarter' | 'Month'
 	hide_on_start: boolean
 	start_with_system: boolean
