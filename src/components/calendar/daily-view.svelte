@@ -88,7 +88,7 @@
 
 {#if dayRecord.records.length > 0}
 	<div
-		class="bg-[#00000080] fixed top-0 left-0 w-screen h-screen outline-none"
+		class="bg-[#00000080] dark:bg-[#ffffff22] fixed top-0 left-0 w-screen h-screen outline-none"
 		role="button"
 		tabindex="-1"
 		transition:fade={{ duration: 100 }}
@@ -98,34 +98,34 @@
 		<div
 			role="button"
 			tabindex="-1"
-			class="fixed bottom-0 bg-white w-full h-[50vh] rounded-t-md pt-3 px-4 box-border flex flex-col gap-2"
+			class="fixed bottom-0 bg-white dark:bg-neutral-8 w-full h-[50vh] rounded-t-md pt-3 px-4 box-border flex flex-col gap-2"
 			transition:fly={{ y: 100, duration: 300 }}
 			on:keyup={() => {}}
 			on:click|stopPropagation
 		>
 			<div class="flex justify-between">
-				<h3 class="text-sm m-0">{todayText}</h3>
+				<h3 class="text-sm m-0 dark:text-neutral-2">{todayText}</h3>
 				<button 
-					class="hover:bg-gray-8 bg-gray-5 w-5 h-4 rounded-sm i-tabler:arrow-back-up"
+					class="hover:bg-gray-8 hover:dark:bg-neutral-2 dark:bg-neutral-4 bg-gray-5 w-5 h-4 rounded-sm i-tabler:arrow-back-up"
 					on:click={hideDailyView}
 				/>
 			</div>
-			<div class="w-full h-6 shadow-md bg-gray-1 rounded-md relative">
+			<div class="w-full h-6 shadow-md bg-gray-1 dark:bg-neutral-6 rounded-md relative">
 				{#each recordsProgress.am as item}
 					<div
-						class="h-6 shadow-md absolute {`bg-green-${dayScore}00`}"
+						class="h-6 shadow-md absolute {`bg-green-${dayScore}00`} {`dark:bg-neutral-${dayScore}`}"
 						class:rounded-l-md={item.start === 0}
 						class:rounded-r-md={item.end === 1}
 						style="left: {item.start * 100}%; width: {(item.end - item.start) * 100}%"
 					/>
 				{/each}
 			</div>
-			<div class="w-full h-6 shadow-md bg-gray-1 relative">
+			<div class="w-full h-6 shadow-md bg-gray-1 dark:bg-neutral-6 relative">
 				{#each recordsProgress.pm as item}
 					<div
 						role="button"
 						tabindex="-1"
-						class="h-6 shadow-md absolute {`bg-green-${dayScore}00`}"
+						class="h-6 shadow-md absolute {`bg-green-${dayScore}00`} {`dark:bg-neutral-${dayScore}`}"
 						class:rounded-l-md={item.start === 0}
 						class:rounded-r-md={item.end === 1}
 						style="left: {item.start * 100}%; width: {(item.end - item.start) * 100}%"

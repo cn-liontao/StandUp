@@ -48,7 +48,7 @@
 						on:mouseover={updateTooltip}
 						tabindex={weekIndex * 7 + dayIndex}
 						data-index={weekIndex * 7 + dayIndex}
-						class="outline-none border-none p-0 w-4 h-4 bg-gray-1 rounded-sm cursor-pointer"
+						class="outline-none border-none p-0 w-4 h-4 bg-gray-1 dark:bg-neutral-7 rounded-sm cursor-pointer"
 					>
 						{#if dayScores.has(day.getTime())}
 							<div
@@ -60,7 +60,7 @@
 				{/each}
 				{#if isFirstWeekOfMonth(week[0])}
 					<div
-						class="pointer-events-none text-stone-600 text-xs font-medium whitespace-nowrap absolute bottom-[-1.2rem]"
+						class="pointer-events-none text-neutral-6 dark:text-neutral-3 text-xs font-medium whitespace-nowrap absolute bottom-[-1.2rem]"
 						class:left-[-0.25rem]={ 0 < weekIndex && weekIndex < 11 }
 					>
 						{formatMonth(week[0])}

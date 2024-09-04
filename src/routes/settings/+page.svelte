@@ -28,6 +28,7 @@
 		>
 			<option class="text-sm" value="light">明亮</option>
 			<option class="text-sm" value="dark">暗黑</option>
+			<option class="text-sm" value="system">系统</option>
 		</select>
 	</label>
 	<label class="flex justify-between">
