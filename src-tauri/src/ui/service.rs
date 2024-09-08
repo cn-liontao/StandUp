@@ -5,6 +5,7 @@ use crate::storage::record::DayRecord;
 use crate::storage::settings::Settings;
 use crate::storage::state::StandingState;
 use crate::ui::notification::schedule_notification;
+use crate::ui::tray::STAND_OR_SIT;
 
 pub fn stand_or_sit(app_handle: AppHandle) -> bool {
     let state: State<StandingState> = app_handle.state();
@@ -28,6 +29,13 @@ pub fn stand_or_sit(app_handle: AppHandle) -> bool {
             cloned_token
         );
     }
+
+    let item_handle = app_handle.tray_handle().get_item(STAND_OR_SIT);
+    let title = if !is_standing { "站起来" } else { "坐下歇会" };
+    item_handle.set_title(title).unwrap();
+    app_handle
+        .emit_all("records-update", get_records(&app_handle.state()))
+        .expect("Emit [records-update] failed");
 
     is_standing
 }

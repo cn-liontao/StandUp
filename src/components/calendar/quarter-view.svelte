@@ -9,6 +9,7 @@
 	import { formatMonth, isFirstWeekOfMonth } from '$lib/calendar';
 	import { useTooltip } from '$components/tooltip/index.svelte';
 	import { useDailyView } from './daily-view.svelte';
+	import { startOfToday } from 'date-fns';
 
 	$: dayScores = $dayRecordsInView.reduce<Map<number, number>>((acc, dayRecord) => {
 		acc.set(dayRecord.date, getActivityScoreByHour(getActiveHoursByRecord(dayRecord)));
@@ -49,6 +50,7 @@
 						tabindex={weekIndex * 7 + dayIndex}
 						data-index={weekIndex * 7 + dayIndex}
 						class="outline-none border-none p-0 w-4 h-4 bg-gray-1 dark:bg-neutral-7 rounded-sm cursor-pointer"
+						class:opacity-30={day > startOfToday()}
 					>
 						{#if dayScores.has(day.getTime())}
 							<div

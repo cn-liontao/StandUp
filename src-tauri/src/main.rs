@@ -54,6 +54,7 @@ fn main() {
             tray_menu_handler(app, event);
         })
         .invoke_handler(tauri::generate_handler![
+            bridge::stand_or_sit,
             bridge::get_records,
             bridge::get_settings,
             bridge::save_settings

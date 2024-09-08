@@ -9,28 +9,22 @@ use crate::ui::window::{create_settings_window, toggle_main_window};
 
 pub mod service;
 pub mod window;
-mod notification;
-
-const STAND_OR_SIT: &str = "stand or sit";
-const TOGGLE_WINDOW: &str = "toggle window";
-const IMPORT_EXTERNAL: &str = "import external records";
-const EXPORT_RECORDS: &str = "export records";
-const SETTINGS: &str = "settings";
-const QUIT: &str = "quit";
+pub mod notification;
+pub mod tray;
 
 pub fn init_tray_menu(hide_on_start: bool) -> SystemTray {
     let tray_menu = SystemTrayMenu::new()
-        .add_item(CustomMenuItem::new(STAND_OR_SIT.to_string(), "站起来"))
+        .add_item(CustomMenuItem::new(tray::STAND_OR_SIT.to_string(), "站起来"))
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(CustomMenuItem::new(TOGGLE_WINDOW.to_string(), if hide_on_start { "打开面板" } else { "隐藏面板" }))
-        .add_item(CustomMenuItem::new(SETTINGS.to_string(), "打开设置"))
+        .add_item(CustomMenuItem::new(tray::TOGGLE_WINDOW.to_string(), if hide_on_start { "打开面板" } else { "隐藏面板" }))
+        .add_item(CustomMenuItem::new(tray::SETTINGS.to_string(), "打开设置"))
         .add_submenu(SystemTraySubmenu::new(
             "备份",
             SystemTrayMenu::new()
-                .add_item(CustomMenuItem::new(IMPORT_EXTERNAL.to_string(), "导入记录"))
-                .add_item(CustomMenuItem::new(EXPORT_RECORDS.to_string(), "导出记录"))
+                .add_item(CustomMenuItem::new(tray::IMPORT_EXTERNAL.to_string(), "导入记录"))
+                .add_item(CustomMenuItem::new(tray::EXPORT_RECORDS.to_string(), "导出记录"))
         ))
-        .add_item(CustomMenuItem::new(QUIT.to_string(), "退出"));
+        .add_item(CustomMenuItem::new(tray::QUIT.to_string(), "退出"));
 
     SystemTray::new().with_menu(tray_menu)
 }
@@ -38,24 +32,20 @@ pub fn init_tray_menu(hide_on_start: bool) -> SystemTray {
 pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-            STAND_OR_SIT => {
-                let is_standing = stand_or_sit(app.clone());
-                let item_handle = app.tray_handle().get_item(&id);
-                let title = if !is_standing { "站起来" } else { "坐下歇会" };
-                item_handle.set_title(title).unwrap();
-                app.emit_all("records-update", get_records(&app.state())).expect("Emit [records-update] failed");
+            tray::STAND_OR_SIT => {
+                stand_or_sit(app.clone());
             }
-            QUIT => {
+            tray::QUIT => {
                 std::process::exit(0);
             }
-            TOGGLE_WINDOW => {
+            tray::TOGGLE_WINDOW => {
                 let visible = toggle_main_window(app);
 
                 let item_handle = app.tray_handle().get_item(&id);
                 let title = if visible { "隐藏面板" } else { "打开面板" };
                 item_handle.set_title(title).unwrap();
             }
-            IMPORT_EXTERNAL => {
+            tray::IMPORT_EXTERNAL => {
                 let app_handle = app.clone();
                 FileDialogBuilder::new().pick_file(move |file_path| {
                     if let Some(external_path) = file_path {
@@ -66,7 +56,7 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                     }
                 });
             }
-            EXPORT_RECORDS => {
+            tray::EXPORT_RECORDS => {
                 let mut data: Vec<String> = vec![];
                 {
                     let state = &app.state::<StandingState>();
@@ -80,8 +70,8 @@ pub fn tray_menu_handler(app: &AppHandle, event: SystemTrayEvent) {
                     }
                 })
             }
-            SETTINGS => {
-                if let Some(settings_window) = app.get_window(SETTINGS) {
+            tray::SETTINGS => {
+                if let Some(settings_window) = app.get_window(tray::SETTINGS) {
                     settings_window.set_focus().unwrap();
                 } else {
                     create_settings_window(app.clone()).unwrap();
