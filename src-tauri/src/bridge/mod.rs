@@ -7,6 +7,11 @@ use crate::{
 };
 
 #[tauri::command]
+pub fn stand_or_sit(app_handle: AppHandle) {
+    service::stand_or_sit(app_handle);
+}
+
+#[tauri::command]
 pub fn get_records(state: State<StandingState>) -> Value {
     service::get_records(&state)
 }

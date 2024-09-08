@@ -24,11 +24,11 @@ export const getIntervalsByRecord = (dayRecord: DayRecord) => {
 }
 export const getActivityScoreByHour = (hours: number) => {
     if (hours < 0) return 0;
-    else if (hours < 0.5) return 2;
-    else if (hours < 1) return 3;
-    else if (hours < 1.5) return 4;
-    else if (hours < 2) return 5;
-    else if (hours < 4) return 6;
+    else if (hours < 1) return 2;
+    else if (hours < 2) return 3;
+		else if (hours < 3) return 4;
+    else if (hours < 4) return 5;
+    else if (hours < 5) return 6;
     else if (hours < 7) return 7;
     else if (hours < 12) return 8;
     else if (hours < 16) return 9;
