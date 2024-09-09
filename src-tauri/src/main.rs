@@ -17,6 +17,10 @@ mod bridge;
 
 
 fn main() {
+    utils::log::init().unwrap_or_else(|err| {
+        println!("logger init failed: {:?}", err);
+    });
+
     let records = read_storage().unwrap_or_else(|err| {
         println!("read_storage failed: {:?}", err);
         vec![]

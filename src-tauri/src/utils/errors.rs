@@ -1,3 +1,5 @@
+use log::SetLoggerError;
+
 pub struct StandingError {
     pub message: String,
 }
@@ -5,6 +7,12 @@ pub struct StandingError {
 #[derive(Debug)]
 pub struct ParsingError {
     pub message: String,
+}
+
+impl From<SetLoggerError> for ParsingError {
+    fn from(value: SetLoggerError) -> Self {
+        ParsingError::init_str(value.to_string())
+    }
 }
 
 impl ParsingError {

@@ -23,6 +23,8 @@ tokio-util = "0.7"
 chrono = "0.4"
 directories = "5.0.1"
 ron = "0.8.1"
+log = "0.4.22"
+simplelog = "0.12.2"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

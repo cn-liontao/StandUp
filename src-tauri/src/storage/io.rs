@@ -12,7 +12,7 @@ const SETTING_FILE_NAME: &str = "settings.ron";
 
 /// Create project path depend on current Os environment
 /// return DataLocalDir and ConfigLocalDir from [directories](https://crates.io/crates/directories)
-fn with_project_path<F>(cb: F) -> Result<(), ParsingError> where F: FnOnce((&Path, &Path)) -> Result<(), ParsingError> {
+pub fn with_project_path<F>(cb: F) -> Result<(), ParsingError> where F: FnOnce((&Path, &Path)) -> Result<(), ParsingError> {
     if let Some(project_dir) = ProjectDirs::from("cn", "meowbot", "StandUp") {
         let data_dir = project_dir.data_local_dir();
         let cfg_dir = project_dir.config_local_dir();
