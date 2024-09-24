@@ -1,4 +1,5 @@
 pub mod errors;
+pub mod log;
 
 use chrono::{Datelike, Local, TimeZone};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -16,4 +17,8 @@ pub fn get_today_timestamp() -> u128 {
         .with_ymd_and_hms(now.year(), now.month(), now.day(), 0, 0, 0)
         .unwrap();
     today.timestamp() as u128 * 1000
+}
+
+pub fn get_today_date() -> String {
+    Local::now().format("%Y%m%d").to_string()
 }
