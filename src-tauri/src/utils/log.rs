@@ -15,7 +15,7 @@ fn touch(path: &Path) -> io::Result<File> {
 }
 
 pub fn init() -> Result<(), ParsingError> {
-    with_project_path(|data_dir, _cfg_dir| {
+    with_project_path(|(data_dir, _cfg_dir)| {
         let mut log_file_path = PathBuf::from(data_dir);
         log_file_path.push(format!("standup-{}.log", get_today_date()));
         let log_file = touch(log_file_path.as_path()).map_err(|e| ParsingError::init_str(e.to_string()))?;
